@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html class='ui-page-login'>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title></title>
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<link href="css/style.css" rel="stylesheet" />
+		<link rel="stylesheet" href="css/iconfont.css" />
+		<style>
+			.header{
+				background:none;
+				box-shadow: none;
+			}
+			.logo{
+				margin-top: 10%;
+				text-align: center;
+			}
+			.logoPic{
+				width: 150px;
+			}
+			#login-form{
+				margin-top: 50px;
+				width: 90%;
+				left: 5%;
+				border-radius:3px;
+			}
+			#login-form .lab{
+				text-align: center;
+				width: 15%;
+			}
+			.icon-loginpassword{
+				color:#999 ;
+			}
+			#password{
+				float: none;
+				width: 65% !important;
+				border-right:1px solid #eee ;
+			}
+			.loginBox{
+				width: 17.5%;
+				display: inline-block;
+				text-align: center;
+			}
+			#login{
+				color: #2bbdf1;
+			}
+			.mui-input-row .mui-input-clear~.mui-icon-clear{
+				right: 60px;
+			}
+			#cloudDiv{
+				width: 100%;
+				height: 100%;
+			}
+			#cloudIframe{
+				border: none;
+			}
+			#zhezhao{
+				position: fixed;
+				top: 500px;
+				margin-left: 15%;
+				width: 70%;
+			}
+			#cloudLogin{
+				display: inline;
+				color: #ccc;
+			}
+			#locationLogin{
+				display: inline;
+				float: right;
+				color: #fff;
+				margin-left: 3px;
+				font-size: 14px;
+			}
+			
+		</style>
+	</head>
+	<body>
+		<header class='mui-bar mui-bar-nav header'></header>
+		<div id='content' class='mui-content'>
+			<div class="mui-img-logo logo">
+				<img class="logoPic" src="images/Fogpod1-01.png" alt="logo"/>
+			</div>
+			<form id='login-form' class='mui-input-group'>
+				<div class="mui-input-row mui-input-rowfuild">
+					<label class="mui-col-xs-1 lab">
+						<i class="iconfont icon-loginpassword"></i>
+					</label>
+					<input type="password" id="password" class="mui-input-clear mui-input" placeholder="password" value="" />
+					<div class="loginBox"><a id="login" href="javascript:;;" onclick="return false" data-lang="login_start">login</a></div>
+				</div>
+			</form>
+		</div>
+		<div id="cloudDiv" class="mui-hidden">
+			<iframe id="cloudIframe" src="http://www.fogpod.com/user/showlogin?r=/admin/index/index" width="100%" height="100%"></iframe>
+		</div>
+		<div id="zhezhao" >
+			<p id="cloudLogin" data-lang="CloudLogin" attr-action="cloud_login">CloudLogin</p>
+			<a id="locationLogin" attr-action="local_login"  data-lang="LoctionLogin">LocationLogin</a>
+		</div>
+		<script src="js/mui.min.js"></script>
+		<script src="js/common.js" ></script>
+		<script src="js/app.js"></script>
+		<script src="js/mui.enterfocus.js"></script>
+		<script src="lang/lang.js" ></script>
+		<script type="text/javascript">
+			(function($,doc){
+				$.init({
+					statusBarBackground:"none"
+				});
+				
+				$.plusReady(function(){
+					//设置要锁定的屏幕方向值
+					plus.screen.lockOrientation("portrait-primary");
+					var settings= app.getSettings();
+					var state=app.getState();
+					//预加载main页面，默认当前页面的URL作为id	
+					var mainPage=$.preload({
+						"id":'main',
+						"url":"main.html"
+					})
+					var language=plus.os.language.substring(0,2);
+					if(language=="zh"){
+						mui.lang(zh);
+					}else{
+						mui.lang(en);
+					}
+					//load事件是什么
+					var main_loaded_flag=false;
+					mainPage.addEventListener("load",function(){
+						main_loaded_flag=true;
+					})
+					var toMain =function(){
+						$.fire(mainPage,"show",null);
+						mainPage.show("pop-in");
+					}
+					//关闭程序启动页面
+					setTimeout(function(){
+						plus.navigator.closeSplashscreen();
+					},600);
+					var loginButton = doc.getElementById('login');
+		
+					var passwordBox = doc.getElementById('password');
+					var listener={
+						cloud_login:function(opts){
+							opts.src.style.color="#fff";
+							doc.getElementById("locationLogin").style.color="gray";
+							var pr=doc.getElementById("cloudDiv");
+							var cn=doc.getElementById("content");
+							if(pr.className.search("mui-hidden")>-1){
+								cn.className+=" mui-hidden";
+								pr.className=pr.className.replace('mui-hidden',''); 
+							}
+						},
+						local_login:function(opts){
+							opts.src.style.color="#fff";
+							doc.getElementById("cloudLogin").style.color="gray";
+							var pr=doc.getElementById("cloudDiv");
+							var cn=doc.getElementById("content");
+							if(cn.className.search("mui-hidden")>-1){
+								pr.className+=" mui-hidden";
+								cn.className=pr.className.replace('mui-hidden',''); 
+							}
+						}
+					}
+					mui.delegate(doc.body,['tap'],listener);
+					loginButton.addEventListener("tap",function(event){
+						var logoInfo={
+							account:"user",
+							password:passwordBox.value
+						};
+						app.login(logoInfo,function(err){
+							if(err){
+								//创建并显示系统样式提示消息，弹出的提示消息为非阻塞模式，显示指定时间后自动消失
+								plus.nativeUI.toast(err);
+								return;
+							}
+							toMain();
+						})
+					});
+					$.enterfocus("#login-form input",function(){
+						$.trigger(loginButton,'tap');
+					})
+//					window.addEventListener("resize",function(){
+//						oauthArea.style.display=document.body.clientHeight>400?"block":"none";
+//					},false);
+				})
+			})(mui,document)
+		</script>
+	</body>
+</html>

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title></title>
+    <link href="css/mui.min.css" rel="stylesheet"/>
+    <link href="css/style.css" rel="stylesheet"/>
+    <style>
+	    	#FirstDivStyle{
+		   text-align: center;
+		   background: rgba(255,255,255,0.5);
+		   width: 90%;
+		   margin-left: 5%;
+		   border-radius: 15px;
+		   
+		 } 
+		 #FirstDivStyle p {
+		 	font-size: 17px;
+		 }
+		 table{
+		 	width: 100%;
+		 }
+		 table td{
+		 	padding: 3px;
+		 }
+	    	 @media only screen and (max-width: 800px) {
+			
+			/* Force table to not be like tables anymore */
+			#no-more-tables table, 
+			#no-more-tables thead, 
+			#no-more-tables tbody, 
+			#no-more-tables th, 
+			#no-more-tables td, 
+			#no-more-tables tr { 
+				display: block; 
+			}
+		 
+			/* Hide table headers (but not display: none;, for accessibility) */
+			#no-more-tables thead tr { 
+				position: absolute;
+				top: -9999px;
+				left: -9999px;
+			}
+		 
+			#no-more-tables tr { border: 1px solid #ccc; }
+		 
+			#no-more-tables td { 
+				/* Behave  like a "row" */
+				border: none;
+				border-bottom: 1px solid #eee; 
+				position: relative;
+				padding-left: 50%; 
+				white-space: normal;
+				text-align:left;
+			}
+		 
+			#no-more-tables td:before { 
+				/* Now like a table header */
+				position: absolute;
+				/* Top/left values mimic padding */
+				top: 6px;
+				left: 6px;
+				width: 45%; 
+				padding-right: 10px; 
+				white-space: nowrap;
+				text-align:left;
+				font-weight: bold;
+			}
+		 
+			/*
+			Label the data
+			*/
+			#no-more-tables td:before { content: attr(data-title); }
+		}
+		.title-value{
+			width: 90%;
+			margin: 0 auto;
+			background-color: rgba(255,255,255,0.5);
+			border-radius: 5px;
+			text-align: center;
+			padding: 10px 0;
+		}
+		.title-value p{
+			font-size: 16px !important;
+		}
+		#secondPage{
+			width: 90%;
+			margin: 10px auto;
+			border-radius: 5px;
+			padding:10px 5px;
+			background-color: rgba(255,255,255,0.5);
+			overflow-y: auto;
+		}
+    </style>
+</head>
+<body>
+		<header class="mui-bar mui-bar-nav" style="background: none;box-shadow:none;">
+			<button type="button" class="mui-left mui-action-back mui-btn mui-btn-link mui-btn-nav mui-pull-left">
+				<span class="mui-icon mui-icon-left-nav" style="color: #fff;"></span>
+			</button> 
+			<h1 class="mui-title" style="color: #fff;" data-lang="flow_set">Flow</h1>
+		</header>
+
+		<div class="mui-content" style="overflow-y: auto;">
+	 		<div class="title-value">
+				<p>上传均值:<span id="sendValue"></span></p>
+				<p>下载均值:<span id="downValue"></span></p>
+				<p>峰值:<span id="meanValue"></span></p>
+			</div>
+			<div id="secondPage" class="mui-table-view mui-table-view-chevron"></div>
+		</div>
+	<script type="text/javascript" src="js/mui.min.js" ></script>
+	<script type="text/javascript" src="js/common.js" ></script>
+	<script type="text/javascript" src="lang/lang.js" ></script>
+	 <script>
+	 		(function($, doc) {
+				$.init();
+				$.plusReady(function() {
+					var language=plus.os.language.substring(0,2);
+					if(language=="zh"){
+						mui.lang(zh);
+					}else{
+						mui.lang(en);
+					}
+					$.router_ajax('/1/app/bw_monitor','get',{"key":plus.storage.getItem('key'),'port':'wan'},function(data){
+						doc.querySelector("#sendValue").innerText=data.data.avgTX;
+						doc.querySelector("#downValue").innerText=data.data.avgRX;
+						doc.querySelector("#meanValue").innerText=data.data.peak;
+						
+						for (var i=0; i < data.data.hosts.length; i++) {
+							var k = i +1;
+							var tb=document.createElement('table');
+							var tr='<tr><td class="mui-col-xs-2">设备'+k+'</td><td class="mui-col-xs-4">'+data.data.hosts[i].txHost+'</td><td class="mui-col-xs-4">'+data.data.hosts[i].rxHost+'</td></tr>'+
+								   '<tr><td class="mui-col-xs-2">端口</td><td class="mui-col-xs-4">'+data.data.hosts[i].txPort+'</td><td class="mui-col-xs-4">'+data.data.hosts[i].rxPort+'</td></tr>'+
+								   '<tr><td class="mui-col-xs-2">速率</td><td class="mui-col-xs-4">'+data.data.hosts[i].avgTX+'</td><td class="mui-col-xs-4">'+data.data.hosts[i].avgRX+'</td></tr>';
+							tb.innerHTML=tr;
+	
+							doc.querySelector('#secondPage').appendChild(tb);
+						}
+					},
+					function(type){
+						plus.nativeUI.toast("请求超时，请重试..")
+					});
+				});
+			}(mui, document));
+	</script>
+</body>
+</html>

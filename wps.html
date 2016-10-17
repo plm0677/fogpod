@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>hello world</title>
+    <link rel="stylesheet" type="text/css" href="css/wzindex.css"/>
+    <link href="css/mui.min.css" rel="stylesheet"/>
+    <link href="css/style.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="lang/lang.js" ></script>
+       <script type="text/javascript" src="js/app.js"></script>
+    <style>
+    #timelabel{
+    	font-size: 35px;
+    	color: black;	
+    }
+    #anniu{
+    	margin-top: 0px;
+    	line-height: 140px;
+    	color: #fff;
+    }
+    #tishi{
+	    position:absolute;
+		bottom:0px;
+		left: 2%;
+		height: 15%;
+		font-size: 21px;
+		width: 100%;
+    }
+    span{
+    	
+    	font-size: 55px; 
+    	font-weight: 900;
+    }
+    #timehelp{
+    	
+    	margin: 75px;
+    }
+    
+    
+    .button-out{
+    	background:rgba(255,255,255,0.4);
+    	border-radius: 80px;
+    	width: 160px;
+    	height: 160px;
+    	margin-top: 50px;
+    }
+    .button-in{
+    	background: rgba(250,80,80,0.8);
+    	width: 140px;
+    	height: 140px;
+    	border-radius: 70px;
+    	position: relative;
+    	top: 10px;
+    	
+    
+    }
+ 	/*.button-in:focus,.button-in:hover{
+ 		background: rgba(100,250,50,0.9);
+ 	}*/
+ 	#button-load{
+ 		width: 100%;
+ 		height: 150px;
+ 		background: rgba(255,255,255,0);
+ 		position: absolute;
+ 		top: 0;
+ 	}
+    </style>
+    
+   
+  
+
+</head>
+<body>
+	<header class="mui-bar mui-bar-nav" style="background: none;box-shadow:none;">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left" style="color: white;"></a>
+			<h1 class="mui-title" style="color: #fff;" data-lang = ""="wps_set">WPS</h1>
+		</header>
+	<div class="mui-content">
+	<div id="timehelp">
+		<center><label id="wenzi"></label></center>
+	<center><label id="timelabel" style="color: #fff;">开启WPS</label></center>
+	
+	<center><div class="button-out" style="position: relative;">
+		
+		<div class="button-in" id="anniu" attr-action="open">
+			点击开启
+			
+		</div>
+		<div id="button-load" class="mui-hidden"></div>
+	</div>
+	
+	
+	
+	
+	<div id="tishi">
+	<label style="color: #fff;"><span>点</span>击按钮，访客直接连WiFi </label>
+		
+	</div>
+	</center>
+	<script src="js/mui.min.js"></script>
+	<script type="text/javascript" src="js/common.js" ></script>
+</body>
+
+<script>
+		    (function($, doc) {
+				$.init();
+				$.plusReady(function() {
+					var listeners = {
+						open:function(opt){
+							var btn=doc.getElementById('anniu');
+							var num=0
+							var close = self.setInterval(function(){
+								num+=1;
+								btn.innerText=num;
+								if(num>12){
+									clearInterval(close);
+									btn.style.backgroundColor="rgba(250,80,80,0.8)";
+									btn.innerText="点击开启"
+								}
+							},1000);
+							mui.router_ajax('/1/wifi/wps_enable','post',{'key':plus.storage.getItem('key'),'mode':1},function(data){
+						   		if(data.status==0){
+						   			btn.style.backgroundColor='rgba(100,250,50,0.9)';
+						   			btn.innerText='开启中...';
+						   			var loadbtn=doc.getElementById('button-load');
+									loadbtn.className=loadbtn.className.replace('mui-hidden','');		
+						   		}else{
+						   			btn.style.backgroundColor="rgba(250,80,80,0.8)";
+						   			btn.innerText='开启失败';
+						   		}
+						   		
+							})
+						}
+					};
+					mui.delegate(doc.body, ['tap'], listeners);
+				});
+			}(mui, document));
+</script>
+</html>

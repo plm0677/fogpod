@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title></title>
+		<link rel="stylesheet" href="css/iconfont.css" />
+		<link rel="stylesheet" href="css/mui.min.css" />
+		<link rel="stylesheet" href="css/style.css" />
+		<style>
+			.mui-table-view{background: none;}
+			.mui-table-view::before,.mui-table-view::after{background: none;}
+			.mui-table-view-cell::before,.mui-table-view-cell::after{background: none;}
+			.mui-table-view-cell{background: rgba(255,255,255,0.5);margin-top: 3%;border-radius: 5px;width: 94%;left: 3%;}
+			.progress{height: 20px; width: 55%;line-height:20px;border: 1px solid #555;border-radius: 5px;color: #007aff;position: relative;float: right !important;margin-right: 10px;}
+			.mui-navigate-right{color: #333 !important;}
+			.red{background: #FF0000;}
+			.yellow{background: #FFC125;}
+			.green{background: #62CB31;}
+			.blue{background:#6495ED ;}
+			.black{background: #000;}
+			.light-green{background: #7CCD7C;}
+			.light-yellow{background: #FFEC8B;}
+			.medium-yellow{background: #FFFF00;}
+			.medium-orange{background: #FF7F24;}
+			.light-orange{background: #FFF68F;}
+			.light-red{background: #FA8072;}
+			.color-red{color: #FF0000;}
+			.color-yellow{color: #FFC125;}
+			.color-green{color: #62CB31;}
+			.color-blue{color:#6495ED ;}
+			.color-black{color: #007aff !important;float: right;margin-right: 10px;}
+			.color-light-green{color: #7CCD7C !important;}
+			.color-light-yellow{color: #FFEC8B !important;}
+			.color-medium-yellow{color: #FFC125 !important;}
+			.color-medium-orange{color: #FF7F24 !important;}
+			.color-light-orange{color: #FF8247 !important;}
+			.color-light-red{color: #FF4040 !important;}
+			.progress b{width:100%;text-align: center; color: #fff;line-height: 18px;font-size: 14px;border-radius: 4px;display: inline-block;position: absolute;top: 0;}
+			.loader-container{
+				background-color: transparent;
+				background-image: -webkit-linear-gradient(left, #99FF00, #FF0000);
+				background: -webkit-gradient(linear, 0 30%, 90% 100%, from(#99FF00),to(#FF0000));
+				background-image: -moz-linear-gradient(left, #99FF00, #FF0000);
+				background-image: -o-linear-gradient(left, #99FF00, #FF0000);
+				background-image: -ms-linear-gradient(left, #99FF00, #FF0000);
+				background-image: linear-gradient(left, #fff, #FF0000);
+				box-shadow: inset 0 -2px 2px rgba(0, 0, 0, 0.1);
+				border-radius: 3px;
+			}
+			.channel-name{
+				width: 30%;
+			}
+			.mui-collapse div{
+				float: left;
+			}
+			.mui-table-view-chevron .mui-table-view-cell{padding-right: 5px;}
+		</style>
+	</head>
+	<body>
+		
+		<header class="mui-bar mui-bar-nav" style="background: none;box-shadow:none;">
+			<button type="button" class="mui-left mui-action-back mui-btn mui-btn-link mui-btn-nav mui-pull-left">
+				<span class="mui-icon mui-icon-left-nav" style="color: #fff;"></span>
+			</button> 
+			<h1 class="mui-title" style="color: #fff;" data-lang="wifi_road">wifi_road</h1>
+		</header>
+
+		<div id="refreshContainer" class="mui-content mui-scroll-wrapper">
+	 		<div class="mui-scroll">
+				<div class="mui-content" id="channel"> 
+					<div style="text-align: center;background: rgba(255,255,255,0.8);padding: 5px;">
+						<span>
+							<span><i class="mui-icon mui-icon-star" style="color: #FF0000;"></i>推荐信道</span>:
+							<span id="recomChannel">1</span>
+						</span>
+					</div>
+					<div style="margin-top:20px;">
+						<p style="text-align: center;color: #fff;font-size: 17px;font-weight: bold;">干扰信道列表</p>
+						<ul class="mui-table-view mui-table-view-chevron">		
+							
+						</ul>
+					</div>
+				</div>
+			</div> 
+		</div>
+		
+		<script src="js/mui.min.js"></script>
+		<script type="text/javascript" src="lang/lang.js" ></script>
+		<script type="text/javascript" src="js/common.js" ></script>
+		<script>
+		   (function($, doc) {
+				$.init();
+				$.plusReady(function() {
+					var language=plus.os.language.substring(0,2);
+					if(language=="zh"){
+						mui.lang(zh);
+					}else{
+						mui.lang(en);
+					}
+					$.router_ajax('/1/wifi/neighbour','get',{"key":plus.storage.getItem('key')},function(data){
+						if (data.status == "0") {
+			                var channelName = new Array();
+			                var channelValue = new Array();
+			                for (var x in data.neighbour) {
+			                    channelName.push(x);
+			                    channelValue.push(data.neighbour[x]);
+			                };
+			
+							// 加颜色
+							var bgcolor;
+			                var txtcolor;
+			                var signalval;
+			                for (var i = 0; i < channelName.length; i++) {
+			
+			                    txtcolor="white";
+			                    signalval =  Math.pow(10,channelValue[i].signal/10);
+			                	if ( signalval>= 0.0001 ) {bgcolor="red";}
+			                	if ((signalval >= 0.00001 ) && (signalval < 0.0001 )) {bgcolor="orange";}
+			                 	if ((signalval >= 0.000001 ) && (signalval < 0.00001 )) {bgcolor="yellow"; txtcolor="black";}
+			                 	if (signalval < 0.000001 ) {bgcolor="green";}
+			                		var li=document.createElement("li");
+			                		li.className="mui-table-view-cell mui-collapse";
+			                		if(Math.abs(channelValue[i].signal)<30){
+			                			li.innerHTML="<div class='channel-name'>"+channelName[i]+"</div><div class='channel' style='width: 70%;'><div class=\"progress\"><b style='width:100%;' class=\"loader-container\">"+channelValue[i].signal+"</b></div><span class=\"color-black\">信道"+(channelValue[i].channel)+"</span></div>";
+			                		}else if(Math.abs(channelValue[i].signal)>=80){
+			                			li.innerHTML="<div class='channel-name'>"+channelName[i]+"</div><div style='width: 70%;'><div class=\"progress\"><b style='width:3%;' class=\"loader-container\">"+channelValue[i].signal+"</b></div><span class=\"color-black\">信道"+(channelValue[i].channel)+"</span></div>";
+			                		}else{
+			                			li.innerHTML="<div class='channel-name'>"+channelName[i]+"</div><div style='width: 70%;'><div class=\"progress\"><b style='width:"+(100-Math.abs(channelValue[i].signal))+"%;' class=\"loader-container\">"+channelValue[i].signal+"</b></div><span class=\"color-black\">信道"+(channelValue[i].channel)+"</span></div>";
+			                		}
+			                		
+			                    
+			                    doc.getElementById("channel").getElementsByTagName("ul")[0].appendChild(li);
+			                };
+			                
+			                 /* 算信道质量    开始*/
+			                var channelPwr = [];
+							var cumChannelConflict =[];
+							for(var i=0;i<channelName.length;i++){
+								cumChannelConflict.push({"channel":i+1,"conflict":0});						
+							};
+			
+							for (var i=0;i<channelName.length;i++) {
+			
+			                        signalval =  Math.pow(10,channelValue[i].signal/10);
+									if(signalval>=0.0000001) {
+			
+										for(var j=0;j<channelName.length;j++){
+											channelPwr.push({"channel":j+1,"signal":0});
+										};
+			
+										switch(parseInt(channelValue[i].channel)){
+										case 1:
+											channelPwr[0].signal+=signalval;
+											channelPwr[1].signal+=signalval;
+											channelPwr[2].signal+=signalval;
+											channelPwr[3].signal+=signalval*0.5;
+											channelPwr[4].signal+=signalval*0.33;
+											break;
+										case 2:
+											channelPwr[0].signal+=signalval;
+											channelPwr[1].signal+=signalval;
+											channelPwr[2].signal+=signalval;
+											channelPwr[3].signal+=signalval;
+											channelPwr[4].signal+=signalval*0.5;
+											channelPwr[5].signal+=signalval*0.33;
+											break;
+										case 3:
+											channelPwr[0].signal+=signalval;
+											channelPwr[1].signal+=signalval;
+											channelPwr[2].signal+=signalval;
+											channelPwr[3].signal+=signalval;
+											channelPwr[4].signal+=signalval;
+											channelPwr[5].signal+=signalval*0.5;
+											channelPwr[6].signal+=signalval*0.33;
+											break;
+										case 4:
+											channelPwr[0].signal+=signalval*0.5;
+											channelPwr[1].signal+=signalval;
+											channelPwr[2].signal+=signalval;
+											channelPwr[3].signal+=signalval;
+											channelPwr[4].signal+=signalval;
+											channelPwr[5].signal+=signalval;
+											channelPwr[6].signal+=signalval*0.5;
+											channelPwr[7].signal+=signalval*0.33;
+											break;
+										case 5:
+											channelPwr[0].signal+=signalval*0.33;
+											channelPwr[1].signal+=signalval*0.5;
+											channelPwr[2].signal+=signalval;
+											channelPwr[3].signal+=signalval;
+											channelPwr[4].signal+=signalval;
+											channelPwr[5].signal+=signalval;
+											channelPwr[6].signal+=signalval;
+											channelPwr[7].signal+=signalval*0.5;
+											channelPwr[8].signal+=signalval*0.33;
+											break;
+										case 6:
+											channelPwr[1].signal+=signalval*0.33;
+											channelPwr[2].signal+=signalval*0.5;
+											channelPwr[3].signal+=signalval;
+											channelPwr[4].signal+=signalval;
+											channelPwr[5].signal+=signalval;
+											channelPwr[6].signal+=signalval;
+											channelPwr[7].signal+=signalval;
+											channelPwr[8].signal+=signalval*0.5;
+											channelPwr[9].signal+=signalval*0.33;
+											break;
+										case 7:
+											channelPwr[2].signal+=signalval*0.33;
+											channelPwr[3].signal+=signalval*0.5;
+											channelPwr[4].signal+=signalval;
+											channelPwr[5].signal+=signalval;
+											channelPwr[6].signal+=signalval;
+											channelPwr[7].signal+=signalval;
+											channelPwr[8].signal+=signalval;
+											channelPwr[9].signal+=signalval*0.5;
+											channelPwr[10].signal+=signalval*0.33;
+											break;
+										case 8:
+											channelPwr[3].signal+=signalval*0.33;
+											channelPwr[4].signal+=signalval*0.5;
+											channelPwr[5].signal+=signalval;
+											channelPwr[6].signal+=signalval;
+											channelPwr[7].signal+=signalval;
+											channelPwr[8].signal+=signalval;
+											channelPwr[9].signal+=signalval;
+											channelPwr[10].signal+=signalval*0.5;
+											break;
+										case 9:
+											channelPwr[4].signal+=signalval*0.33;
+											channelPwr[5].signal+=signalval*0.5;
+											channelPwr[6].signal+=signalval;
+											channelPwr[7].signal+=signalval;
+											channelPwr[8].signal+=signalval;
+											channelPwr[9].signal+=signalval;
+											channelPwr[10].signal+=signalval;
+											break;
+										case 10:
+											channelPwr[5].signal+=signalval*0.33;
+											channelPwr[6].signal+=signalval*0.5;
+											channelPwr[7].signal+=signalval;
+											channelPwr[8].signal+=signalval;
+											channelPwr[9].signal+=signalval;
+											channelPwr[10].signal+=signalval;
+											break;
+										case 11:
+											channelPwr[6].signal+=signalval*0.33;
+											channelPwr[7].signal+=signalval*0.5;
+											channelPwr[8].signal+=signalval;
+											channelPwr[9].signal+=signalval;
+											channelPwr[10].signal+=signalval;
+											break; 
+									};
+									debugger;
+								for (var k=0;k<11;k++){
+									if(channelPwr[k].signal>=0.0000001){ //大于70dbm
+										cumChannelConflict[k].conflict+=1;
+									};
+								};
+									
+								};  //if
+							};
+			
+							//recommend   1   6 or 11
+			                if(cumChannelConflict[0].conflict<=cumChannelConflict[5].conflict && cumChannelConflict[0].conflict<=cumChannelConflict[10].conflict){
+								doc.getElementById("recomChannel").innerText=1;
+							} else if(cumChannelConflict[5].conflict<=cumChannelConflict[10].conflict && cumChannelConflict[5].conflict<=cumChannelConflict[0].conflict){
+								doc.getElementById("recomChannel").innerText=6;
+							} else {
+								doc.getElementById("recomChannel").innerText=11;
+							};
+			
+							
+			                /*算信道质量结束*/
+			            } else {
+			                console.log(data.status)
+			                alert("信号数据获取失败111");
+			            };
+			           mui('#refreshContainer').pullRefresh().endPulldownToRefresh();
+					},
+					function(type){
+						plus.nativeUI.toast("请求超时，请重试..")
+					})
+				});
+			}(mui, document));
+		</script>
+	</body>
+</html>
+

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+
+	<head id="headlink-speed">
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title></title>
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<link rel="stylesheet" href="css/style.css" />
+		<style>
+			a{color: #fff;}
+			.mui-segmented-control{border: 1px solid #fff;}
+			.mui-segmented-control .mui-control-item{border-left: 1px solid #fff;color: #fff;}
+			.mui-segmented-control .mui-control-item.mui-active{background: #fff;color:#007aff;}
+			#info td{padding: 5px 0 5px 0;}
+		</style>
+		<script type="text/javascript" src="lang/lang.js" ></script>
+	</head>
+
+	<body id="loading-width-speed">
+		<header class="mui-bar mui-bar-nav" style="background: none;box-shadow:none;">
+			<button type="button" class="mui-left mui-action-back mui-btn mui-btn-link mui-btn-nav mui-pull-left">
+				<span class="mui-icon mui-icon-left-nav" style="color: #fff;"></span>
+			</button> 
+			<h1 class="mui-title" style="color: #fff;" data-lang="speed_test">speed_test</h1>
+		</header>
+		
+		<div class="mui-content" id="info">
+			<!--<img id="speedImg" style="width: 100px;height: 100px;display: none;" />-->
+			<div class="mui-content-padded" style="margin: 10px 0px;text-align: center;">
+				<div class="mui-content" id="main" style="height:400px;">
+					
+				</div>
+				<button class="mui-btn mui-btn-green style5s_testbtn" id="speed" data-lang="test">test</button>
+				<p id="title"></p>
+				<p style="color: #fff;" id="total"></p>
+				<p style="color: #fff;" id="loaded"></p>
+				<div style="position: absolute;bottom: 0;background: rgba(0,0,0,0.5);width: 100%;">
+					<table class="mui-center" style="width: 100%;color: #fff; padding: 10px;">
+						<tr><td data-lang="download_speed">download_speed</td><td data-lang="upload_speed">upload_speed</td></tr>
+						<tr><td id="downspeed">0</td><td id="upspeed">0</td></tr>
+					</table>
+				</div>
+			</div>
+		</div>
+		<script type="text/javascript" src="js/mui.min.js" ></script>
+		<script type="text/javascript" src="js/jquery.min.js" ></script>
+		<script type="text/javascript" src="js/echarts-all.js" ></script>
+		<script src="js/common.js"></script>
+		<script type="text/javascript" src="lang/lang.js" ></script>
+		<script>
+		var $$=jQuery.noConflict();
+		 
+		function uploadspeed(xhr,time){
+			var urls="http://up.tietuku.com";
+			xhr.open('POST',urls,true); 
+			var path="http://speedtest.10.100new.net/SpeedTest/1m.jpg"; 
+			xhr.responseType='blob';
+			xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+			xhr.upload.addEventListener("progress",function(e){
+				$$("#total").text(e.total);
+				$$("#loaded").text((new Date().getTime())-time.getTime());
+			},false);	 	
+			xhr.send("deadline="+new Date().getTime()+"&aid=1161616&fileurl="+path+"&Token=8cc90b349b6cbd63c84de62312afa01c52c308a0:bF9sY3NGUHZYemFfR3JZM3ExamRpanM4QnBFPQ==:eyJkZWFkbGluZSI6MTQ0ODg2NTM3MCwiYWN0aW9uIjoiZ2V0IiwidWlkIjoiNTMyMjY4IiwiYWlkIjoiMTE2MTYxNiIsImZyb20iOiJ3ZWIifQ==");
+		}
+				var myChart = echarts.init(document.getElementById('main')); 
+				var options={
+				    toolbox: {
+				        show: false,	        
+				    },
+				    series : [
+				        {
+				            name:'网络测速',
+				            type:'gauge',
+				            detail : {
+								textStyle: {
+							        color: '#fff',
+							        fontSize : 30
+							    }
+				            },
+				            legendHoverLink: true,
+				            splitNumber: 10,
+				            max: 10,
+				            axisLine:{
+				            	    show: true,
+				                lineStyle: {
+				                    color: [
+				                        [
+				                            0.4,
+				                            '#7CCD7C'
+				                        ],
+				                        [
+				                            0.8,
+				                            '#FFB90F'
+				                        ],
+				                        [
+				                            1,
+				                            '#ff4500'
+				                        ]
+				                    ],
+				                    width: 20
+				                }
+				            },
+				            title: {
+				                show: true,
+				                textStyle: {
+				                    color: '#fff',
+				                    fontSize: 15,
+				                    fontWeight: 'bolder'
+				                }
+				            },
+				            axisLabel: {
+				                //坐标轴文本标签，详见axis.axisLabelshow: true,
+				                formatter: function(v){
+				                    return v+"M";
+				                },
+				                textStyle: {
+				                    //其余属性默认使用全局文本样式，详见TEXTSTYLEcolor: '#fff',
+				                    fontWeight: 'bolder',
+				                    fontFamily: 'Verdana'
+				                }
+				            },
+				            data:[{value: 0, name: 'Mbps'}]
+				        }
+				    ]
+				};
+				
+			myChart.setOption(options);
+			(function($, doc) {
+				$.init();
+				$.plusReady(function() {	
+					var style5s = "<link id='style5s' href='css/style5s.css' rel='stylesheet' />";
+					var style4s = "<link href='css/style4s.css' rel='stylesheet' />";
+				if($$("#loading-width-speed").width()=="320"){
+					var style5s = "<link id='style5s' href='css/style5s.css' rel='stylesheet' />";
+					$$("#headlink-speed").append(style5s);
+					
+				}     
+				if($$("#loading-width-speed").height()==480){
+					$$("#style5s").remove();
+					$$("#headlink-speed").append(style4s);
+					
+				}
+					var language=plus.os.language.substring(0,2);
+					if(language=="zh"){
+						mui.lang(zh);
+					}else{
+						mui.lang(en);
+					}
+					var xhr=new XMLHttpRequest();
+					mui("#info").on('tap','#speed',function(){
+						
+						var avgDown=0;
+						var Rand = Math.random();  
+		        			var RandNum = 1 + Math.round(Rand * 99);
+						xhr.open('GET','http://cdnpod.speedtest.cn/SpeedTest/1m.jpg?r='+RandNum,true); 
+						xhr.responseType='blob';
+						var starttime=new Date();
+						var speed=[];
+						var sum=0;
+						$.ajax({
+							type:"post",
+							url:"http://up.tietuku.com",
+							data:{"deadline":new Date().getTime(),"aid":1161616,"fileurl":"http://speedtest.10.100new.net/SpeedTest/1m.jpg","Token":"8cc90b349b6cbd63c84de62312afa01c52c308a0:bF9sY3NGUHZYemFfR3JZM3ExamRpanM4QnBFPQ==:eyJkZWFkbGluZSI6MTQ0ODg2NTM3MCwiYWN0aW9uIjoiZ2V0IiwidWlkIjoiNTMyMjY4IiwiYWlkIjoiMTE2MTYxNiIsImZyb20iOiJ3ZWIifQ=="},
+							async:true,
+							beforeSend:function(){
+							//	alert("开始");
+							//	plus.nativeUI.showWaiting();	
+							},
+							complete:function() {
+								//	alert("结束");
+								plus.nativeUI.closeWaiting();
+							},
+							success:function(data){
+								//alert("成功");
+								$$("#upspeed").text(((1048576/(new Date()-starttime)*3)/128).toFixed(2));
+							}
+						});
+						xhr.addEventListener("progress",function(e){
+							var endtime=new Date();  
+							var loaded=(e.loaded/(endtime-starttime)).toFixed(2);
+							var spmb=(loaded/128).toFixed(2);
+							speed.push(parseFloat(spmb));
+							var serierData=[{'data':[{'value':spmb,'name':'Mbps'}]}];
+							myChart.setSeries(serierData);
+							if(e.loaded==e.total){
+								for(var i=0;i<speed.length;i++){
+									sum+=speed[i];
+								}
+								avgDown=(sum/speed.length).toFixed(2);
+								serierData=[{'data':[{'value':avgDown,'name':'Mbps'}]}];
+								myChart.setSeries(serierData);
+								$$("#downspeed").text(avgDown);
+							}
+						});		 
+						xhr.send(null);
+//						var urls="http://up.tietuku.com";
+//			xhr.open('POST',urls,true); 
+//			var path="http://speedtest.10.100new.net/SpeedTest/1m.jpg"; 
+//			xhr.responseType='blob';
+//			xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+//			xhr.upload.addEventListener("progress",function(e){ 
+//				$$("#total").text(e.total);
+//				$$("#loaded").text((new Date().getTime())-time.getTime());
+//			},false);	 	
+//			xhr.send("deadline="+new Date().getTime()+"&aid=1161616&fileurl="+path+"&Token=8cc90b349b6cbd63c84de62312afa01c52c308a0:bF9sY3NGUHZYemFfR3JZM3ExamRpanM4QnBFPQ==:eyJkZWFkbGluZSI6MTQ0ODg2NTM3MCwiYWN0aW9uIjoiZ2V0IiwidWlkIjoiNTMyMjY4IiwiYWlkIjoiMTE2MTYxNiIsImZyb20iOiJ3ZWIifQ==");
+					});
+					var mainPage = $.preload({
+						"id": 'main',
+						"url": 'main.html'
+					});
+				});
+			}(mui, document));
+		</script>
+	</body>
+
+</html>
